@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Template to create primary RDS instance for automated RTO/RPO recovery
+
+Parameters: 
+  DBInstanceIdentifier:
+    Type: String
+    Default: rds-primary-db
+    Description: Identifier for the primary RDS instance
+  MasterUsername:
+    Type: String
+    Default: admin
+    Description: Master username for database
+  MasterUserPassword:
+    Type: String
+    Noecho: true
+    Description: Master user password for Data base
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.micro
+    Descritpion: RDS Instance class
+  AllocatedStorage:
+    Type: Number
+    Default: 20
+    Description: Storage size in GB.
+
+Resources:
+  PrimaryDBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Ref DBInstanceIdentifier
+      Engine: mysql
+      MasterUsername: !Ref MasterUsername
+      MasterUserPassword: !Ref MasterUserPassword
+      AllocatedStorage: !Ref AllocatedStorage
+      DBInstanceClass: !Ref DBInstanceClass
+      PubliclyAccessible: true
+      BackupRetentionPeriod: 1
+      MultiAZ: false
+
+Outputs:
+  PrimaryDBEndpoint: 
+    Description: Endpoint of the primary DB instance
+    Value: !GetAtt PrimaryDBInstance.Endpoint.Address
