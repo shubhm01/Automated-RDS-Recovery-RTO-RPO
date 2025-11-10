@@ -1,0 +1,102 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create SSM Parameter Store entries for RDS identifiers, endpoints, and credentials (secure: no hardcoded secrets)
+
+Parameters:
+  PrimaryDBIdentifier:
+    Type: String
+    Description: Identifier of the primary RDS instance
+
+  PrimaryDBEndpoint:
+    Type: String
+    Description: Endpoint of the primary RDS instance
+
+  PrimaryDBUser:
+    Type: String
+    Description: Username for the primary database
+
+  PrimaryDBPassword:
+    Type: String
+    Description: Value for the secure password (use SSM SecureString name or Secrets Manager ARN)
+    NoEcho: true
+
+  SecondaryDBIdentifier:
+    Type: String
+    Description: Identifier of the read replica RDS instance
+
+  SecondaryDBEndpoint:
+    Type: String
+    Description: Endpoint of the secondary RDS instance
+
+Resources:
+  PrimaryDBIdentifierParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /SparkApp/prod/primary-db-identifier
+      Type: String
+      Value: !Ref PrimaryDBIdentifier
+      Description: Identifier of the primary RDS instance
+
+  PrimaryDBEndpointParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /SparkApp/prod/primary-db-endpoint
+      Type: String
+      Value: !Ref PrimaryDBEndpoint
+      Description: Endpoint of the primary RDS instance
+
+  PrimaryDBUserParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /SparkApp/prod/primary-db-user
+      Type: String
+      Value: !Ref PrimaryDBUser
+      Description: Username for the primary database
+
+  PrimaryDBPasswordParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /SparkApp/prod/primary-db-password
+      Type: SecureString
+      Value: !Ref PrimaryDBPassword
+      Description: Secure password for the primary database
+
+  SecondaryDBIdentifierParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /SparkApp/prod/secondary-db-identifier
+      Type: String
+      Value: !Ref SecondaryDBIdentifier
+      Description: Identifier of the read replica RDS instance
+
+  SecondaryDBEndpointParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /SparkApp/prod/secondary-db-endpoint
+      Type: String
+      Value: !Ref SecondaryDBEndpoint
+      Description: Endpoint of the secondary RDS instance
+
+Outputs:
+  PrimaryDBIdentifierParamName:
+    Description: Primary DB identifier parameter name
+    Value: !Ref PrimaryDBIdentifierParam
+    Export:
+      Name: PrimaryDBIdentifierParamName
+
+  PrimaryDBEndpointParamName:
+    Description: Primary DB endpoint parameter name
+    Value: !Ref PrimaryDBEndpointParam
+    Export:
+      Name: PrimaryDBEndpointParamName
+
+  SecondaryDBIdentifierParamName:
+    Description: Secondary DB identifier parameter name
+    Value: !Ref SecondaryDBIdentifierParam
+    Export:
+      Name: SecondaryDBIdentifierParamName
+
+  SecondaryDBEndpointParamName:
+    Description: Secondary DB endpoint parameter name
+    Value: !Ref SecondaryDBEndpointParam
+    Export:
+      Name: SecondaryDBEndpointParamName
