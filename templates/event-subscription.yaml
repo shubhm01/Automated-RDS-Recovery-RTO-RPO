@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create RDS Event Subscription for automated recovery notifications.
+
+Parameters:
+  RDSInstanceIdentifier:
+    Type: String
+    Description: The identifier of the primary RDS instance.
+
+  SNSTopicArn:
+    Type: String
+    Description: ARN of the SNS topic to send RDS event notifications to.
+
+Resources:
+  RDSEventSubscription:
+    Type: AWS::RDS::EventSubscription
+    Properties:
+      Enabled: true
+      EventCategories:
+        - availability
+        - failover
+        - maintenance
+        - deletion
+      SnsTopicArn: !Ref SNSTopicArn
+      SourceIds:
+        - !Ref RDSInstanceIdentifier
+      SourceType: db-instance
+
+Outputs:
+  RDSEventSubscriptionName:
+    Description: Name of the RDS event subscription
+    Value: !Ref RDSEventSubscription

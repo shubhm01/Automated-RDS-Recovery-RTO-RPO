@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploys the Lambda function that automates RDS failover recovery.
+
+Parameters:
+  LambdaRoleArn:
+    Type: String
+    Description: ARN of the IAM role for Lambda execution.
+
+  S3BucketName:
+    Type: String
+    Description: S3 bucket where the Lambda deployment package (ZIP) is stored.
+
+  S3Key:
+    Type: String
+    Description: The S3 key (file name) of the Lambda deployment package.
+
+  DatabaseEmailsTopic:
+    Type: String
+    Description: ARN of the SNS topic for database email alerts.
+
+Resources:
+  RecoveryLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: RecoveryLambdaFunction
+      Handler: recovery_lambda.lambda_handler
+      Role: !Ref LambdaRoleArn
+      Runtime: python3.12
+      Timeout: 60
+      MemorySize: 256
+      Code:
+        S3Bucket: !Ref S3BucketName
+        S3Key: !Ref S3Key
+      Environment:
+        Variables:
+          DatabaseEmailsTopic: !Ref DatabaseEmailsTopic
+
+Outputs:
+  RecoveryLambdaArn:
+    Description: ARN of the Lambda function used for automated RDS recovery.
+    Value: !GetAtt RecoveryLambdaFunction.Arn

@@ -1,0 +1,39 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+    commands:
+      - echo "Installing dependencies..."
+      - pip install boto3
+
+  pre_build:
+    commands:
+      - echo "Zipping Lambda function..."
+      - cd lambda
+      - zip -r ../lambda_package.zip .
+      - cd ..
+
+  build:
+    commands:
+      - echo "Deploying CloudFormation stacks..."
+      - aws cloudformation package \
+          --template-file templates/recovery-handler.yaml \
+          --s3-bucket my-lambda-artifacts-bucket \
+          --output-template-file packaged-template.yaml
+
+      - aws cloudformation deploy \
+          --template-file packaged-template.yaml \
+          --stack-name AutomatedRDSRecoveryStack \
+          --capabilities CAPABILITY_NAMED_IAM \
+          --region us-east-1
+
+  post_build:
+    commands:
+      - echo "Deployment complete!"
+      - aws cloudformation describe-stacks --stack-name AutomatedRDSRecoveryStack
+
+artifacts:
+  files:
+    - packaged-template.yaml
