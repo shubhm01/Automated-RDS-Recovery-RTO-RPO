@@ -1,0 +1,12 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Desciption: Create and RDS Read Replica for recovery
+
+Resources: 
+  RDSReadReplica: 
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceindentifier: "rds-read-replica"
+      SourceDBInstanceIdentifier: !Ref PrimaryRDSInstance
+      DBInstanceClass: db.t3.micro
+      PubliclyAccessible: false
+      StorageType: gp2
