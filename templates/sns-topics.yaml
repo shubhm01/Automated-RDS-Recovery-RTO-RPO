@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: SNS Topics and Subscriptions for Automated Recovery
+
+Resources:
+  #Topic for DB Events: Failures Notifications
+  RDSEventTopic: 
+    Type: AWS::SNS::Topic
+    Properties: 
+      TopicName: rds-event-topic
+      DisplayName: "RDS Event Notifications"
+    
+  #Topic for Email Alerts to Notify StakeHolders
+  EmailAlertTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: email-alert-topic
+      DisplayName: "Email Alerts for RDS Alerts"
+
+  #Subscription for sending Email Notifications
+  EmailSubscription:
+    Type: AWS::SNS::Topic
+    Properties: 
+      Protocol: Email
+      Endpoint: "team_distribution_list@company.com"
+      TopicArn: !Ref EmailAlertTopic
+
+Outputs:
+  RDSEventTopicArn: 
+    Description: ARN of RDS Event Topic
+    Value: !Ref RDSEventTopic
+    Export: 
+      Name: RDSEventTopicArn
+
+  EmailAlertTopicArn: 
+    Description: ARN of the Email Alert Topic
+    Value: !Ref EmailAlertTopic
+    Export:
+      Name: EmailAlertTopicArn
